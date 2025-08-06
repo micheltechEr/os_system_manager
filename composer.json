@@ -1,0 +1,18 @@
+{
+    "name": "angelomiguel/service_oder_manager",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Ângelo Miguel",
+            "email": "48892449+micheltechEr@users.noreply.github.com"
+        }
+    ],
+    "require": {
+        "bramus/router": "^1.6",
+        "vlucas/phpdotenv": "^5.6"
+    }
+}

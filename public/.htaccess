@@ -1,0 +1,10 @@
+RewriteEngine On
+
+# Se a requisição não for para um arquivo existente...
+RewriteCond %{REQUEST_FILENAME} !-f
+
+# E se a requisição não for para um diretório existente...
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# ... então redirecione a requisição para o nosso único ponto de entrada: index.php.
+RewriteRule . index.php [L]
