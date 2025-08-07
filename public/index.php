@@ -15,6 +15,9 @@ $router = new \Bramus\Router\Router();
 // Inclui o arquivo que define as rotas
 require __DIR__ . '/../routes/api.php';
 
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH, OPTIONS");
+
 // Executa o roteador
 $router->run();
 
