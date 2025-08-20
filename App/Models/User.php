@@ -29,6 +29,7 @@ class User
             $success = $stmt->execute($params);
             if($success){
                 return $this->pdo->lastInsertId();
+                
             }
             return false;
         }
@@ -56,7 +57,7 @@ class User
             $_SESSION['email'] = $row['email'];
             $_SESSION['password'] = $row['password'];
             $_SESSION['role'] = $row['role'];
-            return true;
+            return $row['id'];
         }
         catch(PDOException $e){
             echo json_encode("Aconteceu algum erro durante o login e a senha ". $e);
@@ -123,10 +124,33 @@ class User
         try{
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([':id'=>$id]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
+            return $stmt->rowCount();
         }
         catch(PDOException $e){
+            echo json_encode($e);
+        }
+    }
+    public function create_session(int $id):string{
+        $token = bin2hex(random_bytes(32));
+        $hashedToken = hash('sha256',$token);
+        $expiresAt= date('Y-m-d H:i:s',time()+(8600 * 30));
+        $sql = "INSERT INTO user_sessions(user_id,session_token,expires_at) VALUES(:user_id, :session_token, :expires_at)";
+
+        try{
+            $stmt= $this->pdo->prepare($sql);
+            $sucess = $stmt->execute([
+                ':user_id'=> $id,
+                ':session_token'=> $hashedToken,
+                'expires_at'=> $expiresAt
+            ]);
+
+            if($sucess){
+                return $token;
+            }
             return false;
+        }
+        catch(PDOException $e){
+            error_log("Erro ao criar sessão");
         }
     }
 } 

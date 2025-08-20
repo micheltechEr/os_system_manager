@@ -32,6 +32,12 @@ class UserController{
                 echo json_encode(['erro' => 'Erro no servidor: ' . $e->getMessage()]);
         }
     }
+    public function remindMe($userId){
+        $session_token = $this->userModel->create_session($userId);
+        $setCookieName = 'session_cookie';
+        $expiration = time() + (86400 * 30);
+        setcookie($setCookieName,$session_token,$expiration,'/','',true,true);
+    }
     public function loginUser(){
         $data = json_decode(file_get_contents('php://input'),true);
         if(empty($data['email']) || empty($data['password'])){
@@ -46,12 +52,10 @@ class UserController{
                     "status"=> 'success',
                     'message'=> 'Login efetuado com sucesso'
                 ];
-                // $setCookieName = 'session_cookie';
-                // $token = $_COOKIE['session_token'];
-                // $expiration = time() + (86400 * 30);
-                // setcookie($setCookieName,$token,$expiration,'/','',true,true);
-
-
+                if(isset($data['remind_me']) && $data['remind_me'] == true){
+                    $this->remindMe($loginResponse);
+                }
+                        
                 http_response_code(200);
                 echo json_encode($response);
             }
@@ -86,7 +90,6 @@ class UserController{
             echo json_encode("Aconteceu algo interno no servidor, erro ". $e);
         }
     }
-
     public function getUserInfoById($id){
         $userInfo = $this->userModel->user_info($id);
         try{
@@ -102,6 +105,32 @@ class UserController{
             http_response_code(500);
             echo json_encode("Aconteceu algum erro no servidor, tente novamente");
         }
+    }
+    public function deleteById($id){
+        try{
+            $affectedRows = $this->userModel->delete($id);
+            if($affectedRows > 0){
+                $response=[
+                    'status' => 'success',
+                    'message' => 'Removido com sucess'
+                ];
+                echo json_encode($response);
+                http_response_code(204);
+            }
+            else{
+                $response=[
+                    'status' => 'success',
+                    'message' => 'Nenhuma linha foi alterado'
+                ];
+
+                echo json_encode($response);
+            }
+        }
+        catch(PDOException $e){
+            http_response_code(500);
+            echo json_encode("Aconteceu algo interno no servidor, erro ". $e);
+        }
+
     }
 }
 ?>
